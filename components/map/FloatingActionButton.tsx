@@ -1,6 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import { useThemeColor } from '@/hooks/use-theme-color';
 
 export default function FloatingActionButton() {
@@ -24,6 +25,7 @@ export default function FloatingActionButton() {
         }),
       }}
       activeOpacity={0.7}
+      onPress={() => router.push('/report-item')}
     >
       <Ionicons name="add" size={28} color="white" />
     </TouchableOpacity>

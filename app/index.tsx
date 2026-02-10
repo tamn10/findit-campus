@@ -43,6 +43,14 @@ export default function WelcomeScreen() {
           <Text className="underline">Privacy Policy</Text>
         </Text>
       </View>
+
+      <Link href="/map" asChild>
+      <Pressable className="w-full border border-blue-600 py-4 rounded-2xl">
+            <Text className="text-center text-blue-600 text-lg font-semibold">
+              Map Test
+            </Text>
+          </Pressable>
+      </Link>
     </SafeAreaView>
   );
 }
