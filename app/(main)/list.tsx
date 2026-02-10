@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 
-import Header from '@/components/list/Header';
 import TabSelector from '@/components/list/TabSelector';
 import PostCard from '@/components/list/PostCard';
-import NewPostButton from '@/components/list/NewPostButton';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import PageHeader from '@/components/shared/PageHeader';
 
 // Mock data - will be replaced with Firebase data later
 const activePosts = [
@@ -36,6 +37,7 @@ export default function MyPostsScreen() {
   const backgroundColor = useThemeColor({}, 'background');
   const iconColor = useThemeColor({}, 'icon');
   const colorScheme = useColorScheme();
+  const tintColor = useThemeColor({}, 'tint');
 
   // Filter posts based on selected tab
   const filteredPosts = selectedTab === 'Active' ? activePosts : []; // returnedPosts will be used once we have data];
@@ -44,7 +46,9 @@ export default function MyPostsScreen() {
     <View className="flex-1" style={{ backgroundColor }}>
       <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
 
-      <Header />
+      <PageHeader 
+        title="My Posts"
+      />
 
       <TabSelector selectedTab={selectedTab} onSelectTab={setSelectedTab} />
 
@@ -70,7 +74,24 @@ export default function MyPostsScreen() {
         )}
       </ScrollView>
 
-      <NewPostButton />
+      {/* New Post Button - INLINED */}
+      <TouchableOpacity
+        className="absolute bottom-6 right-6 flex-row items-center px-6 py-4 rounded-full"
+        style={{
+          backgroundColor: tintColor,
+          shadowColor: tintColor,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 8,
+        }}
+        onPress={() => router.push('/report-item')}
+      >
+        <Ionicons name="add" size={24} color="#fff" style={{ marginRight: 8 }} />
+        <Text className="text-white font-semibold text-base">
+          New Post
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }

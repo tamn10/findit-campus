@@ -1,15 +1,15 @@
 import React from 'react';
-import { View, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
-import Header from '@/components/report-items/Header';
-import ProgressIndicator from '@/components/report-items/ProgressIndicator';
+import ProgressIndicator from '@/components/ui/ProgressIndicator';
 import LocationSection from '@/components/report-items/LocationSection';
 import ItemDetailsForm from '@/components/report-items/ItemDetailsForm';
 import PhotoUpload from '@/components/report-items/PhotoUpload';
 import SubmitButton from '@/components/report-items/SubmitButton';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import PageHeader from '@/components/shared/PageHeader';
 
 export default function ReportItemScreen() {
   const backgroundColor = useThemeColor({}, 'background');
@@ -27,7 +27,11 @@ export default function ReportItemScreen() {
     >
       <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
 
-      <Header />
+      <PageHeader 
+        title="Report Item"
+        rightIcon="help-circle"
+        onRightPress={() => alert('Need help? Contact support at support@findit.com')}
+      />
 
       <ScrollView 
         className="flex-1"
