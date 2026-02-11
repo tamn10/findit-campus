@@ -15,7 +15,7 @@ export default function MapView() {
   const controlBackgroundColor = backgroundColor;
 
   return (
-    <View className="mx-4 mb-4 rounded-2xl overflow-hidden h-80 relative">
+    <View className="mx-4 mb-4 rounded-2xl overflow-hidden h-[110%] relative">
       {/* Empty Map Background */}
       <View 
         className="flex-1 items-center justify-center"
@@ -42,7 +42,10 @@ export default function MapView() {
           }),
         }}
         activeOpacity={0.7}
-        onPress={() => router.push('/report-item')}
+        onPress={() => router.push({
+          pathname: '/report-item',
+          params: { from: 'map' }
+        })}
       >
         <Ionicons name="add" size={28} color="white" />
       </TouchableOpacity>

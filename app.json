@@ -38,6 +38,18 @@
             "backgroundColor": "#000000"
           }
         }
+      ],
+      [ 
+        "expo-camera",
+        {
+          "cameraPermission": "Allow TitanFind to take photos of items"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow TitanFind to access your photos"
+        }
       ]
     ],
     "experiments": {

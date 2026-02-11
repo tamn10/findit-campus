@@ -18,21 +18,21 @@ export default function Header({ searchQuery, onSearchChange }: HeaderProps) {
 
   return (
     <View 
-      className="pt-12 pb-4 px-4 border-b"
+      className="pt-12 pb-4 px-4 mt-2 border-b"
       style={{ 
         backgroundColor,
         borderBottomColor: colorScheme === 'dark' ? '#2a2a2a' : '#e5e7eb' 
       }}
     >
-      <View className="flex-row items-center justify-between mb-4">
+      <View className="flex-row items-center justify-between mb-2">
         <View className="flex-row items-center">
           <View 
-            className="w-8 h-8 rounded-full items-center justify-center mr-2"
+            className="w-12 h-12 rounded-full items-center justify-center mr-2"
             style={{ backgroundColor: tintColor + '20' }}
           >
-            <Ionicons name="map" size={18} color={tintColor} />
+            <Ionicons name="map" size={24} color={tintColor} />
           </View>
-          <Text className="text-xl font-bold" style={{ color: textColor }}>
+          <Text className="text-2xl font-bold" style={{ color: textColor }}>
             Campus Map
           </Text>
         </View>
@@ -47,7 +47,7 @@ export default function Header({ searchQuery, onSearchChange }: HeaderProps) {
 
       {/* Search Bar */}
       <View 
-        className="flex-row items-center rounded-lg px-3 py-2"
+        className="flex-row items-center rounded-lg px-3 py-3"
         style={{ backgroundColor: colorScheme === 'dark' ? '#2a2a2a' : '#f3f4f6' }}
       >
         <Ionicons name="search" size={20} color={iconColor} />

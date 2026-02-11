@@ -8,7 +8,7 @@ export default function SubmitButton() {
 
   return (
     <TouchableOpacity
-      className="mx-4 mb-8 flex-row items-center justify-center py-4 rounded-2xl"
+      className="mx-4 mb-10 mt-4 flex-row items-center justify-center py-4 rounded-2xl"
       style={{
         backgroundColor: tintColor,
         shadowColor: '#000',

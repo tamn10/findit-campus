@@ -48,6 +48,7 @@ export default function MyPostsScreen() {
 
       <PageHeader 
         title="My Posts"
+        backTo='/map'
       />
 
       <TabSelector selectedTab={selectedTab} onSelectTab={setSelectedTab} />
@@ -76,7 +77,7 @@ export default function MyPostsScreen() {
 
       {/* New Post Button - INLINED */}
       <TouchableOpacity
-        className="absolute bottom-6 right-6 flex-row items-center px-6 py-4 rounded-full"
+        className="absolute bottom-12 right-8 flex-row items-center px-6 py-4 rounded-full"
         style={{
           backgroundColor: tintColor,
           shadowColor: tintColor,
@@ -85,7 +86,10 @@ export default function MyPostsScreen() {
           shadowRadius: 8,
           elevation: 8,
         }}
-        onPress={() => router.push('/report-item')}
+        onPress={() => router.push({
+          pathname: '/report-item',
+          params: { from: 'list' }
+        })}
       >
         <Ionicons name="add" size={24} color="#fff" style={{ marginRight: 8 }} />
         <Text className="text-white font-semibold text-base">
