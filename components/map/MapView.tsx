@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, TouchableOpacity, Text, Platform } from 'react-native';
+import { View, TouchableOpacity, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import FloatingActionButton from './FloatingActionButton';
 
 export default function MapView() {
   const tintColor = useThemeColor({}, 'tint');
@@ -24,28 +24,8 @@ export default function MapView() {
         <Ionicons name="map-outline" size={48} color={iconColor} />
       </View>
 
-      {/* Action Button - Top Right Corner */}
-      <TouchableOpacity
-        className="absolute top-3 right-3 w-14 h-14 rounded-full items-center justify-center"
-        style={{
-          backgroundColor: tintColor,
-          shadowColor: tintColor,
-          ...Platform.select({
-            ios: {
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.3,
-              shadowRadius: 8,
-            },
-            android: {
-              elevation: 8,
-            },
-          }),
-        }}
-        activeOpacity={0.7}
-        onPress={() => router.push('/report-item')}
-      >
-        <Ionicons name="add" size={28} color="white" />
-      </TouchableOpacity>
+      {/* Floating Action Button - Top Right Corner */}
+      <FloatingActionButton />
 
       {/* Zoom Controls */}
       <View className="absolute right-3" style={{ top: '50%', marginTop: -48 }}>

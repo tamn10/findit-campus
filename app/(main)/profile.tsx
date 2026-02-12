@@ -1,10 +1,10 @@
 import React from 'react';
-import { View, Text} from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import PageHeader from '@/components/shared/PageHeader';
 
 export default function ProfileScreen() {
   const backgroundColor = useThemeColor({}, 'background');
@@ -17,9 +17,21 @@ export default function ProfileScreen() {
       <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
 
       {/* Header */}
-      <PageHeader 
-        title="Profile"
-      />
+      <View 
+        className="pt-12 pb-4 px-4 flex-row items-center"
+        style={{ backgroundColor }}
+      >
+        <TouchableOpacity 
+          className="w-10 h-10 items-center justify-center mr-4"
+          onPress={() => router.back()}
+        >
+          <Ionicons name="chevron-back" size={28} color={textColor} />
+        </TouchableOpacity>
+        
+        <Text className="text-xl font-bold" style={{ color: textColor }}>
+          Profile
+        </Text>
+      </View>
 
       {/* Content */}
       <View className="flex-1 items-center justify-center px-6">
