@@ -11,7 +11,7 @@ export default function LocationSection() {
   const colorScheme = useColorScheme() ?? 'light';
 
   return (
-    <View className="px-6 mb-6">
+    <View className="px-4 mb-6">
       <Text className="text-lg font-bold mb-3" style={{ color: textColor }}>
         Item Location
       </Text>

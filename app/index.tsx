@@ -43,10 +43,7 @@ export default function WelcomeScreen() {
           <Text className="underline">Privacy Policy</Text>
         </Text>
       </View>
-      
 
-      {/* Temporary Map Test Button. Remove this later 
-      ==================================================*/}
       <Link href="/map" asChild>
       <Pressable className="w-full border border-blue-600 py-4 rounded-2xl">
             <Text className="text-center text-blue-600 text-lg font-semibold">
@@ -54,8 +51,6 @@ export default function WelcomeScreen() {
             </Text>
           </Pressable>
       </Link>
-      {/*==================================================*/}
-
     </SafeAreaView>
   );
 }

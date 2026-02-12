@@ -12,7 +12,7 @@ export default function ProgressIndicator({ currentStep, totalSteps }: ProgressI
   const iconColor = useThemeColor({}, 'icon');
 
   return (
-    <View className="items-center py-4">
+    <View className="items-center py-6">
       {/* Progress Dots */}
       <View className="flex-row gap-2 mb-2">
         {Array.from({ length: totalSteps }).map((_, index) => (
@@ -26,10 +26,10 @@ export default function ProgressIndicator({ currentStep, totalSteps }: ProgressI
         ))}
       </View>
 
-      {/* Step Counter - Modify this text to change step numbers 
+      {/* Step Counter - Modify this text to change step numbers */}
       <Text className="text-sm" style={{ color: tintColor }}>
         Step {currentStep} of {totalSteps}
-      </Text>*/}
+      </Text>
     </View>
   );
 }

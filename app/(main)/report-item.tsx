@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { useLocalSearchParams } from 'expo-router';
 
-import ProgressIndicator from '@/components/ui/progress-indicator';
+import ProgressIndicator from '@/components/ui/ProgressIndicator';
 import LocationSection from '@/components/report-items/LocationSection';
 import ItemDetailsForm from '@/components/report-items/ItemDetailsForm';
 import PhotoUpload from '@/components/report-items/PhotoUpload';
@@ -15,43 +14,6 @@ import PageHeader from '@/components/shared/PageHeader';
 export default function ReportItemScreen() {
   const backgroundColor = useThemeColor({}, 'background');
   const colorScheme = useColorScheme();
-
-  // Get params from navigation
-  const params = useLocalSearchParams<{ 
-    from?: string | string[], 
-    photos?: string | string[] 
-  }>();
-  
-  // Parse 'from' param
-  const fromParam = Array.isArray(params.from) ? params.from[0] : params.from;
-  const backRoute = fromParam === 'list' ? '/list' : '/map';
-  
-  // Parse 'photos' param - it comes as a JSON string
-  let photosParam: string[] = [];
-  if (params.photos) {
-    const photosValue = Array.isArray(params.photos) ? params.photos[0] : params.photos;
-    if (typeof photosValue === 'string') {
-      try {
-        photosParam = JSON.parse(photosValue);
-      } catch {
-        // If not valid JSON, treat as single photo URI
-        photosParam = [photosValue];
-      }
-    }
-  }
-
-  // Manage photos locally to avoid navigation on removal
-  const [localPhotos, setLocalPhotos] = useState<string[]>(photosParam);
-
-  // Update local photos when params change (when returning from camera)
-  useEffect(() => {
-    setLocalPhotos(photosParam);
-  }, [params.photos]);
-
-  // Handle photo removal without navigation
-  const handleRemovePhoto = (index: number) => {
-    setLocalPhotos(prev => prev.filter((_, i) => i !== index));
-  };
 
   // MODIFY THESE VALUES to change step progression
   const CURRENT_STEP = 1;
@@ -67,7 +29,6 @@ export default function ReportItemScreen() {
 
       <PageHeader 
         title="Report Item"
-        backTo={backRoute}
         rightIcon="help-circle"
         onRightPress={() => alert('Need help? Contact support at support@findit.com')}
       />
@@ -85,12 +46,8 @@ export default function ReportItemScreen() {
         {/* Item Details (Category + Description) */}
         <ItemDetailsForm />
 
-        {/* Photo Upload - Pass photos array and removal handler */}
-        <PhotoUpload 
-          photos={localPhotos} 
-          from={fromParam}
-          onRemovePhoto={handleRemovePhoto}
-        />
+        {/* Photo Upload */}
+        <PhotoUpload />
 
         {/* Submit Button */}
         <SubmitButton />

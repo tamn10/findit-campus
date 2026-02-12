@@ -20,7 +20,7 @@ export default function ItemDetailsForm() {
   const borderColor = colorScheme === 'dark' ? '#2a2a2a' : '#e5e7eb';
 
   return (
-    <View className="px-6 mb-4 mt-4">
+    <View className="px-4 mb-6">
       <Text className="text-lg font-bold mb-4" style={{ color: textColor }}>
         Item Details
       </Text>
