@@ -5,6 +5,13 @@ export default function HomeScreen() {
   return (
     <View className="flex-1 items-center justify-center bg-white">
       <Text className="text-5xl">Home</Text>
+      <Text>
+        Welcome Back{" "}
+        <Text className="font-bold text-blue-600">
+          {useAuth().user?.displayName}
+        </Text>
+      </Text>
+
       <Text className="text-center text-gray-400 mt-4 text-sm">
         This is the protected home screen. Only visible when logged in.
       </Text>
