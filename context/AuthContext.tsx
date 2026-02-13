@@ -1,0 +1,52 @@
+import { auth } from "@/firebaseConfig";
+import { onAuthStateChanged, signOut, User } from "firebase/auth";
+import {
+  createContext,
+  PropsWithChildren,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+
+type AuthState = {
+  user?: User | null;
+  loading: boolean;
+  logOut: () => void;
+};
+
+export const AuthContext = createContext<AuthState>({
+  user: null,
+  loading: true,
+  logOut: async () => {},
+});
+
+export function AuthProvider({ children }: PropsWithChildren) {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      console.log("Auth state changed:", currentUser);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const logOut = async () => {
+    try {
+      await signOut(auth);
+      setUser(null);
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, loading, logOut }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export const useAuth = () => useContext(AuthContext);
