@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import { useAuth } from "@/context/AuthContext";
 import { Pressable, Text, View } from "react-native";
 
@@ -20,6 +21,13 @@ export default function HomeScreen() {
         className="mt-6 bg-red-500 px-6 py-3 rounded-2xl"
       >
         <Text className="text-white text-lg font-semibold">← Logout</Text>
+      </Pressable>
+
+      <Pressable
+        onPress={() => {router.push('/map')}}
+        className="mt-6 bg-red-500 px-6 py-3 rounded-2xl"
+      >
+        <Text className="text-white text-lg font-semibold">Map Test</Text>
       </Pressable>
     </View>
   );
