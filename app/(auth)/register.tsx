@@ -15,7 +15,7 @@ export default function RegisterScreen() {
   const [loading, setLoading] = useState(false);
 
   const handleSignup = async () => {
-    if (!email || !password || !confirmPassword) {
+    if (!name || !email || !password || !confirmPassword) {
       setError("Fill all fields");
       return;
     }
@@ -44,7 +44,6 @@ export default function RegisterScreen() {
         password,
       );
       await updateProfile(userCredential.user, { displayName: name });
-      router.replace("/(auth)/login");
     } catch (error) {
       alert("Failed to register. Please try again.");
       console.error("Error registering user:", error);
