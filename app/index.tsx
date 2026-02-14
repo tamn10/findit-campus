@@ -4,12 +4,14 @@ import { Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function WelcomeScreen() {
+  console.log("Welcome screen rendered");
   return (
-    <SafeAreaView className="flex-1">
+    <SafeAreaView className="flex-1 bg-white justify-between">
       <View className="flex-1 justify-center items-center">
         <Image
-          source={require("../assets/images/icon.png")}
-          className="w-64 h-64"
+          source={require("../assets/images/Logoo.png")}
+          style={{ width: 256, height: 256 }}
+          contentFit="contain"
         />
       </View>
       <View className="flex-1 items-center justify-center px-6">
