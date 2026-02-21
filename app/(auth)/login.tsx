@@ -1,12 +1,12 @@
+import { useAuthActions } from "@/hooks/useAuthActions";
 import { Link, useRouter } from "expo-router";
-import { signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { auth } from "../../firebaseConfig";
 
 export default function LoginScreen() {
   const router = useRouter();
+  const { login } = useAuthActions();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -21,8 +21,7 @@ export default function LoginScreen() {
     try {
       setLoading(true);
       setError("");
-      await signInWithEmailAndPassword(auth, email, password);
-      router.replace("/(protected)/(tabs)/home");
+      await login(email, password);
     } catch (err: any) {
       setError(err.message || "Failed to sign in");
     } finally {

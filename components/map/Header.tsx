@@ -1,8 +1,8 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { Ionicons } from "@expo/vector-icons";
+import React from "react";
+import { Text, TextInput, TouchableOpacity, View } from "react-native";
 
 interface HeaderProps {
   searchQuery: string;
@@ -10,25 +10,20 @@ interface HeaderProps {
 }
 
 export default function Header({ searchQuery, onSearchChange }: HeaderProps) {
-  const backgroundColor = useThemeColor({}, 'background');
-  const textColor = useThemeColor({}, 'text');
-  const tintColor = useThemeColor({}, 'tint');
-  const iconColor = useThemeColor({}, 'icon');
-  const colorScheme = useColorScheme() ?? 'light';
+  const backgroundColor = useThemeColor({}, "background");
+  const textColor = useThemeColor({}, "text");
+  const tintColor = useThemeColor({}, "tint");
+  const iconColor = useThemeColor({}, "icon");
+  const colorScheme = useColorScheme() ?? "light";
 
   return (
-    <View 
-      className="pt-12 pb-4 px-4 mt-2 border-b"
-      style={{ 
-        backgroundColor,
-        borderBottomColor: colorScheme === 'dark' ? '#2a2a2a' : '#e5e7eb' 
-      }}
-    >
+    <View className="pt-12 pb-4 px-4 mt-2 border-b">
+      {/* Logo and Notification Icon */}
       <View className="flex-row items-center justify-between mb-2">
         <View className="flex-row items-center">
-          <View 
+          <View
             className="w-12 h-12 rounded-full items-center justify-center mr-2"
-            style={{ backgroundColor: tintColor + '20' }}
+            style={{ backgroundColor: tintColor + "20" }}
           >
             <Ionicons name="map" size={24} color={tintColor} />
           </View>
@@ -38,7 +33,7 @@ export default function Header({ searchQuery, onSearchChange }: HeaderProps) {
         </View>
         <TouchableOpacity className="relative">
           <Ionicons name="notifications-outline" size={24} color={textColor} />
-          <View 
+          <View
             className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
             style={{ backgroundColor: "red" }}
           />
@@ -46,9 +41,11 @@ export default function Header({ searchQuery, onSearchChange }: HeaderProps) {
       </View>
 
       {/* Search Bar */}
-      <View 
+      <View
         className="flex-row items-center rounded-lg px-3 py-3"
-        style={{ backgroundColor: colorScheme === 'dark' ? '#2a2a2a' : '#f3f4f6' }}
+        style={{
+          backgroundColor: colorScheme === "dark" ? "#2a2a2a" : "#f3f4f6",
+        }}
       >
         <Ionicons name="search" size={20} color={iconColor} />
         <TextInput
