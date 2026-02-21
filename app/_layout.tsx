@@ -8,10 +8,22 @@ import {
 import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
+import { Platform, View } from "react-native";
 import "react-native-reanimated";
 import "../global.css";
 
 export default function RootLayout() {
+  if (Platform.OS === "web") {
+    return (
+      <AuthProvider>
+        <View className="flex-1 items-center justify-center bg-gray-100 min-h-screen">
+          <View className="w-[480px] flex-1 bg-white overflow-hidden shadow-xl min-h-screen max-h-screen">
+            <RootNavigator />
+          </View>
+        </View>
+      </AuthProvider>
+    );
+  }
   return (
     <AuthProvider>
       <RootNavigator />
@@ -44,6 +56,7 @@ function RootNavigator() {
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" />
+        <Stack.Screen name="introduction" />
         <Stack.Screen name="(auth)" />
         <Stack.Screen name="(protected)" />
       </Stack>
