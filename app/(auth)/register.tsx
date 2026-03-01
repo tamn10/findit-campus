@@ -1,12 +1,12 @@
+import { useAuthActions } from "@/hooks/useAuthActions";
 import { Link, useRouter } from "expo-router";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { auth } from "../../firebaseConfig";
 
 export default function RegisterScreen() {
   const router = useRouter();
+  const { register } = useAuthActions();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,25 +38,19 @@ export default function RegisterScreen() {
     try {
       setLoading(true);
       setError("");
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password,
-      );
-      await updateProfile(userCredential.user, { displayName: name });
-    } catch (error) {
-      alert("Failed to register. Please try again.");
-      console.error("Error registering user:", error);
+      await register(name, email, password);
+      router.replace("/(auth)/verify-email");
+    } catch (err: any) {
+      setError(err.message || "Failed to register. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  console.log("Register screen rendered");
   return (
     <SafeAreaView className="flex-1 bg-white">
       <View className="flex-1 items-center justify-center">
-        <Text className="text-5xl mb-10">Sign Up</Text>
+        <Text className="text-5xl mb-10 font-extrabold">Sign Up</Text>
         <View className="gap-4 border border-gray-300 rounded-md p-4 mt-4 w-3/4">
           <Text className="text-red-500">{error}</Text>
           <Text>Name</Text>

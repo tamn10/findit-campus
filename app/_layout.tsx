@@ -28,11 +28,18 @@ function RootNavigator() {
   useEffect(() => {
     if (loading) return;
 
+    // Check if we're in an auth route or a protected route
     const inAuthGroup = segments[0] === "(auth)";
     const inProtectedGroup = segments[0] === "(protected)";
 
-    if (user && !inProtectedGroup) {
-      router.replace("/(protected)/(tabs)/home");
+    if (user && !user.emailVerified) {
+      // Route user to email verification screen if not verified
+      if (segments[1] !== "verify-email") {
+        router.replace("/(auth)/verify-email");
+      }
+    } else if (user && user.emailVerified && !inProtectedGroup) {
+      // If logged in and email verified but not in protected route, send to home
+      router.replace("/(protected)/(tabs)/map");
     } else if (!user && inProtectedGroup) {
       router.replace("/");
     }

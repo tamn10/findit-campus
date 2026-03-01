@@ -1,11 +1,11 @@
-import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
-import { CameraView } from 'expo-camera';
-import { Ionicons } from '@expo/vector-icons';
-import { StatusBar } from 'expo-status-bar';
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { CameraView } from "expo-camera";
+import { StatusBar } from "expo-status-bar";
+import React from "react";
+import { Text, TouchableOpacity, View } from "react-native";
 
-import { useCameraLogic } from '@/hooks/use-camera-logic';
-import CameraControls from '@/components/report-items/CameraControls';
+import CameraControls from "@/components/report-items/CameraControls";
+import { useCameraLogic } from "@/hooks/use-camera-logic";
 
 export default function CameraScreen() {
   const {
@@ -48,11 +48,7 @@ export default function CameraScreen() {
     <View className="flex-1 bg-black">
       <StatusBar style="light" />
 
-      <CameraView 
-        ref={cameraRef}
-        style={{ flex: 1 }}
-        facing={facing}
-      >
+      <CameraView ref={cameraRef} style={{ flex: 1 }} facing={facing}>
         {/* Top Header */}
         <View className="absolute top-0 left-0 right-0 bg-white pt-12 pb-4">
           <View className="flex-row items-center justify-between px-4">
@@ -64,7 +60,7 @@ export default function CameraScreen() {
             </TouchableOpacity>
 
             <Text className="text-lg font-bold">Report Found Item</Text>
-            
+
             {photoCount > 0 ? (
               <View className="bg-blue-500 px-3 py-1 rounded-full">
                 <Text className="text-white text-xs font-bold">
@@ -78,13 +74,16 @@ export default function CameraScreen() {
         </View>
 
         {/* Centered Guide Box */}
-        <View className="absolute inset-0 items-center justify-center" pointerEvents="none">
-          <View 
+        <View
+          className="absolute inset-0 items-center justify-center"
+          pointerEvents="none"
+        >
+          <View
             className="w-80 h-96 rounded-3xl"
             style={{
               borderWidth: 2,
-              borderColor: 'rgba(255, 255, 255, 0.5)',
-              borderStyle: 'dashed',
+              borderColor: "rgba(255, 255, 255, 0.5)",
+              borderStyle: "dashed",
             }}
           />
           <View className="absolute bottom-0 left-0 right-0 bg-black/60 py-3 px-6 rounded-b-3xl">
