@@ -47,11 +47,10 @@ export default function RegisterScreen() {
     }
   };
 
-  console.log("Register screen rendered");
   return (
     <SafeAreaView className="flex-1 bg-white">
       <View className="flex-1 items-center justify-center">
-        <Text className="text-5xl mb-10">Sign Up</Text>
+        <Text className="text-5xl mb-10 font-extrabold">Sign Up</Text>
         <View className="gap-4 border border-gray-300 rounded-md p-4 mt-4 w-3/4">
           <Text className="text-red-500">{error}</Text>
           <Text>Name</Text>

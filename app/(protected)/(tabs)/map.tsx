@@ -1,30 +1,61 @@
-import BottomNavigation from "@/components/map/BottomNavigation";
 import Header from "@/components/map/Header";
+import RecentlyFoundItems from "@/components/map/RecentlyFoundItems";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import * as Location from "expo-location";
-import React, { useEffect, useState } from "react";
-import { View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { TouchableOpacity, View } from "react-native";
 import MapView from "react-native-maps";
 
-// Reserve space for bottom navigation
-const BOTTOM_NAV_HEIGHT = 65;
+const recentlyFoundItems = [
+  {
+    id: "1",
+    name: "AirPods Pro",
+    location: "Science Lab",
+    status: "New",
+  },
+  {
+    id: "2",
+    name: "Denim Jacket",
+    location: "Library",
+    status: "Found",
+  },
+  {
+    id: "3",
+    name: "Water Bottle",
+    location: "Gym",
+    status: "New",
+  },
+  {
+    id: "4",
+    name: "Textbook",
+    location: "Library",
+    status: "Found",
+  },
+  {
+    id: "5",
+    name: "Backpack",
+    location: "Student Union",
+    status: "Found",
+  },
+];
 
 export default function CampusMapScreen() {
-  const [uselocation, setUselocation] =
-    useState<Location.LocationObject | null>(null);
+  const mapRef = useRef<MapView>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState("Electronics");
   const [searchQuery, setSearchQuery] = useState("");
   const backgroundColor = useThemeColor({}, "background");
   const colorScheme = useColorScheme();
-  const [location, setLocation] = useState({
-    initialPosition: {
-      latitude: 33.8823,
-      longitude: -117.8851,
-      latitudeDelta: 0.005,
-      longitudeDelta: 0.005,
-    },
+  const [location, setLocation] = useState<Location.LocationObject | null>(
+    null,
+  );
+  const [initialPosition, setInitialPosition] = useState({
+    latitude: 33.8808,
+    longitude: -117.885,
+    latitudeDelta: 0.005,
+    longitudeDelta: 0.005,
   });
 
   useEffect(() => {
@@ -38,17 +69,78 @@ export default function CampusMapScreen() {
     text = JSON.stringify(location);
   }
 
+  const handleUserLocation = async () => {
+    try {
+      // Request location permissions
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+
+      // move map to user location
+      if (mapRef.current && location) {
+        mapRef.current.animateToRegion(
+          {
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          },
+          1000,
+        );
+      }
+    } catch (error) {
+      setErrorMsg("Error fetching location");
+    }
+  };
+
+  const handleInitialLocation = () => {
+    if (mapRef.current) {
+      mapRef.current.animateToRegion(initialPosition, 1000);
+    }
+  };
+
   return (
     <View className="flex-1" style={{ backgroundColor }}>
       <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} />
-      <MapView
-        style={{ width: "100%", height: "100%" }}
-        initialRegion={location.initialPosition}
-        showsMyLocationButton={true}
-        showsUserLocation={true}
-        provider={undefined}
-      />
-      <BottomNavigation activeTab="Map" />
+      <View className="flex-1">
+        {/* Map View */}
+        <MapView
+          ref={mapRef}
+          style={{ flex: 1 }}
+          initialRegion={initialPosition}
+          showsMyLocationButton={false}
+          showsUserLocation={true}
+          showsCompass={false}
+          provider={undefined}
+        />
+
+        {/* User Location & Initial Location Buttons */}
+
+        <View className="absolute top-5 right-3 gap-2">
+          <TouchableOpacity
+            activeOpacity={0.8}
+            className="bg-white p-3 shadow-lg rounded-lg"
+            onPress={handleInitialLocation}
+          >
+            <Ionicons name="home" size={24} color="black" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            className="bg-white p-3 shadow-lg rounded-lg"
+            onPress={handleUserLocation}
+          >
+            <Ionicons name="navigate" size={24} color="black" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Placeholder for recently found items*/}
+        <RecentlyFoundItems />
+      </View>
     </View>
   );
 }

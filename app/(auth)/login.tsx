@@ -29,11 +29,10 @@ export default function LoginScreen() {
     }
   };
 
-  console.log("Login screen rendered");
   return (
     <SafeAreaView className="flex-1 bg-white">
       <View className="flex-1 items-center justify-center">
-        <Text className="text-5xl mb-10">Welcome</Text>
+        <Text className="text-5xl mb-10 font-extrabold">Sign In</Text>
         <View className="gap-4 border border-gray-300 rounded-md p-4 mt-4 w-3/4">
           <Text>School Email</Text>
           <TextInput

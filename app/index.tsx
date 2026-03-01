@@ -4,7 +4,6 @@ import { Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function WelcomeScreen() {
-  console.log("Welcome screen rendered");
   return (
     <SafeAreaView className="flex-1 bg-white justify-between">
       <View className="flex-1 justify-center items-center">
@@ -15,8 +14,9 @@ export default function WelcomeScreen() {
         />
       </View>
       <View className="flex-1 items-center justify-center px-6">
-        <Text className="text-5xl font-extrabold text-blue-600 mb-2">
-          Titan Find
+        <Text className="text-5xl font-extrabold text-orange-600 mb-2">
+          <Text className="text-orange-600">Titan</Text>
+          <Text className="text-blue-600"> Find</Text>
         </Text>
 
         <Text className="text-center text-sm text-gray-400 mb-10">
