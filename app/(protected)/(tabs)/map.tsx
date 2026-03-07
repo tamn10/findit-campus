@@ -2,7 +2,8 @@ import Header from "@/components/map/Header";
 import MapControls from "@/components/map/MapControl";
 import RecentlyFoundItems from "@/components/map/RecentlyFoundItems";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import { useMapLocation } from "@/hooks/useMapLocation";
+import { useItemsActions } from "@/hooks/useItemsActions";
+import { useMapLocation } from "@/hooks/useMapLocations";
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheet, {
   BottomSheetBackdrop,
@@ -14,36 +15,6 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Text, View } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 
-const lostItemsMarkers = [
-  {
-    id: "1",
-    name: "AirPods Pro",
-    image: "https://m.media-amazon.com/images/I/71-AOet91UL.jpg",
-    description: "White AirPods Pro with charging case",
-    posterName: "Alice",
-    latitude: 33.8815,
-    longitude: -117.8855,
-  },
-  {
-    id: "2",
-    name: "Denim Jacket",
-    image: "https://m.media-amazon.com/images/I/71-AOet91UL.jpg",
-    description: "Blue denim jacket with a hood",
-    posterName: "Bob",
-    latitude: 33.8805,
-    longitude: -117.8845,
-  },
-  {
-    id: "3",
-    name: "Water Bottle",
-    image: "https://m.media-amazon.com/images/I/71-AOet91UL.jpg",
-    description: "Clear water bottle with a straw",
-    posterName: "Charlie",
-    latitude: 33.88,
-    longitude: -117.886,
-  },
-];
-
 type LostItem = {
   id: string;
   name: string;
@@ -51,6 +22,7 @@ type LostItem = {
   posterName: string;
   latitude: number;
   longitude: number;
+  createdAt: Date;
 };
 
 export default function CampusMapScreen() {
@@ -65,6 +37,7 @@ export default function CampusMapScreen() {
   const [location, setLocation] = useState<Location.LocationObject | null>(
     null,
   );
+  const [lostItems, setLostItems] = useState<LostItem[]>([]);
   const [initialPosition, setInitialPosition] = useState({
     latitude: 33.8808,
     longitude: -117.885,
@@ -72,8 +45,24 @@ export default function CampusMapScreen() {
     longitudeDelta: 0.005,
   });
 
+  const { fetchItems, getPosterName } = useItemsActions();
+
   useEffect(() => {
     Location.requestForegroundPermissionsAsync();
+    fetchItems().then((items) => {
+      console.log("Fetched items:", items);
+      const formattedItems = items.map((item: any) => ({
+        id: item.id,
+        name: item.description,
+        description: item.description,
+        posterName: item.posterId,
+        latitude: item.location[0],
+        longitude: item.location[1],
+        createdAt: item.createdAt,
+      }));
+
+      setLostItems(formattedItems);
+    });
   }, []);
 
   let text = "Waiting...";
@@ -108,15 +97,16 @@ export default function CampusMapScreen() {
           showsCompass={false}
           provider={undefined}
         >
-          {lostItemsMarkers.map((item) => (
+          {lostItems.map((item) => (
             <Marker
               key={item.id}
               coordinate={{
                 latitude: item.latitude,
                 longitude: item.longitude,
               }}
-              onPress={() => {
-                setSelectedItem(item);
+              onPress={async () => {
+                const poster = await getPosterName(item.posterName);
+                setSelectedItem({ ...item, posterName: poster });
                 bottomSheetRef.current?.expand();
               }}
             />
