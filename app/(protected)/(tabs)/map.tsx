@@ -110,6 +110,7 @@ export default function CampusMapScreen() {
         >
           {lostItemsMarkers.map((item) => (
             <Marker
+              key={item.id}
               coordinate={{
                 latitude: item.latitude,
                 longitude: item.longitude,
