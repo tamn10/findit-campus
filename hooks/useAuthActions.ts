@@ -1,10 +1,11 @@
-import { auth } from "@/firebaseConfig";
+import { auth, db } from "@/firebaseConfig";
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
   signInWithEmailAndPassword,
   updateProfile,
 } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 import { Alert } from "react-native";
 
 export function useAuthActions() {
@@ -28,12 +29,19 @@ export function useAuthActions() {
         auth,
         email,
         password,
-      ).then(async (userCredential) => {
-        await updateProfile(userCredential.user, { displayName: name });
-        await sendEmailVerification(userCredential.user);
-        return userCredential;
+      );
+
+      const user = userCredential.user;
+      await updateProfile(user, { displayName: name });
+      await setDoc(doc(db, "users", user.uid), {
+        uid: user.uid,
+        name,
+        email,
+        avatarUrl: "",
+        createdAt: new Date(),
       });
-      return { user: userCredential.user, success: true };
+      await sendEmailVerification(user);
+      return { user, success: true };
     } catch (error) {
       console.error("Error registering user:", error);
       throw error;
