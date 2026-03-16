@@ -68,6 +68,7 @@ export default function ReportItemScreen() {
       0, // Placeholder longitude
       localPhotos,
       user?.uid || "posterId-placeholder", // Replace with actual poster ID from auth
+      user?.displayName || "posterName-placeholder", // Replace with actual poster name from auth
       description,
       selectedCategory,
     );

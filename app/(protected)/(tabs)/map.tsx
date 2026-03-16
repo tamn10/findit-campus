@@ -1,24 +1,23 @@
 import Header from "@/components/map/Header";
+import ItemBottomSheet from "@/components/map/ItemBottomSheet";
 import MapControls from "@/components/map/MapControl";
 import RecentlyFoundItems from "@/components/map/RecentlyFoundItems";
+import { useAuth } from "@/context/AuthContext";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { useItemsActions } from "@/hooks/useItemsActions";
 import { useMapLocation } from "@/hooks/useMapLocations";
-import { Ionicons } from "@expo/vector-icons";
-import BottomSheet, {
-  BottomSheetBackdrop,
-  BottomSheetView,
-} from "@gorhom/bottom-sheet";
-import { Image } from "expo-image";
+import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import * as Location from "expo-location";
+import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 
 type LostItem = {
   id: string;
   name: string;
   description: string;
+  posterId: string;
   posterName: string;
   latitude: number;
   longitude: number;
@@ -31,6 +30,7 @@ export default function CampusMapScreen() {
     useMapLocation();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState("Electronics");
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const backgroundColor = useThemeColor({}, "background");
   const [selectedItem, setSelectedItem] = useState<LostItem | null>(null);
@@ -44,18 +44,19 @@ export default function CampusMapScreen() {
     latitudeDelta: 0.005,
     longitudeDelta: 0.005,
   });
+  const { user } = useAuth();
 
   const { fetchItems, getPosterName } = useItemsActions();
 
   useEffect(() => {
     Location.requestForegroundPermissionsAsync();
     fetchItems().then((items) => {
-      console.log("Fetched items:", items);
       const formattedItems = items.map((item: any) => ({
         id: item.id,
         name: item.description,
         description: item.description,
-        posterName: item.posterId,
+        posterId: item.posterId,
+        posterName: item.posterName,
         latitude: item.location[0],
         longitude: item.location[1],
         createdAt: item.createdAt,
@@ -105,8 +106,7 @@ export default function CampusMapScreen() {
                 longitude: item.longitude,
               }}
               onPress={async () => {
-                const poster = await getPosterName(item.posterName);
-                setSelectedItem({ ...item, posterName: poster });
+                setSelectedItem(item);
                 bottomSheetRef.current?.expand();
               }}
             />
@@ -120,55 +120,13 @@ export default function CampusMapScreen() {
           onInititalLocation={handleInitialLocation}
         />
         {selectedItem && (
-          <BottomSheet
-            ref={bottomSheetRef}
-            snapPoints={["50%"]}
-            index={-1}
-            enablePanDownToClose={true}
-            backdropComponent={renderBackdrop}
-          >
-            <BottomSheetView className="flex-1 mx-4 gap-7">
-              <View className="flex-row items-center gap-4">
-                <Image
-                  source="https://picsum.photos/seed/696/3000/2000"
-                  contentFit="cover"
-                  transition={1000}
-                  style={{ width: 64, height: 64, borderRadius: 8 }}
-                />
-                <View className="flex-1">
-                  <Text className="text-blue-600 font-semibold">
-                    FOUND 2H AGO
-                  </Text>
-                  <Text className="font-bold text-3xl">
-                    {selectedItem.name}
-                  </Text>
-                  <Text className="text-gray-600">
-                    {selectedItem.description}
-                  </Text>
-                </View>
-                <Ionicons name="bookmark-outline" size={22} color="#6b7280" />
-              </View>
-              <View className="flex-row bg-gray-100 rounded-lg p-5 items-center gap-4">
-                <Ionicons
-                  name="person-circle-outline"
-                  size={32}
-                  color="#6b7280"
-                />
-                <View>
-                  <Text className="text-gray-600">Posted by</Text>
-                  <Text className="font-semibold">
-                    {selectedItem.posterName}
-                  </Text>
-                </View>
-              </View>
-              <View className="flex-row bg-blue-500 rounded-2xl p-5 items-center gap-2 justify-center">
-                <Ionicons name="chatbox" size={24} color="#ffff" />
-                <Text className="text-white font-bold text-lg">
-                  Message Finder
-                </Text>
-              </View>
-            </BottomSheetView>
-          </BottomSheet>
+          <ItemBottomSheet
+            bottomSheetRef={bottomSheetRef}
+            renderBackdrop={renderBackdrop}
+            selectedItem={selectedItem}
+            currentUser={user}
+            router={router}
+          />
         )}
       </View>
     </View>

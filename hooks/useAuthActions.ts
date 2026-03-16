@@ -40,7 +40,7 @@ export function useAuthActions() {
         avatarUrl: "",
         createdAt: new Date(),
       });
-      await sendEmailVerification(user);
+      // await sendEmailVerification(user);
       return { user, success: true };
     } catch (error) {
       console.error("Error registering user:", error);
