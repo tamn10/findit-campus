@@ -1,27 +1,27 @@
-import { useLocalSearchParams } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import React, { useEffect, useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { useLocalSearchParams } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import React, { useEffect, useState } from "react";
+import { KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 
-import ItemDetailsForm from '@/components/report-items/ItemDetailsForm';
-import LocationSection from '@/components/report-items/LocationSection';
-import PhotoUpload from '@/components/report-items/PhotoUpload';
-import SubmitButton from '@/components/report-items/SubmitButton';
-import PageHeader from '@/components/shared/PageHeader';
-import ProgressIndicator from '@/components/ui/progress-indicator';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { useThemeColor } from '@/hooks/use-theme-color';
-import { useSubmitActions } from '@/hooks/use-submit-actions';
-import { useAuth } from '@/context/AuthContext';
+import ItemDetailsForm from "@/components/report-items/ItemDetailsForm";
+import LocationSection from "@/components/report-items/LocationSection";
+import PhotoUpload from "@/components/report-items/PhotoUpload";
+import SubmitButton from "@/components/report-items/SubmitButton";
+import PageHeader from "@/components/shared/PageHeader";
+import ProgressIndicator from "@/components/ui/progress-indicator";
+import { useAuth } from "@/context/AuthContext";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeColor } from "@/hooks/use-theme-color";
+import { useItemsActions } from "@/hooks/useItemsActions";
 
 export default function ReportItemScreen() {
-  const backgroundColor = useThemeColor({}, 'background');
+  const backgroundColor = useThemeColor({}, "background");
   const colorScheme = useColorScheme();
-  const { submitItem } = useSubmitActions();
+  const { submitItem } = useItemsActions();
   const { user } = useAuth();
 
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [description, setDescription] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [description, setDescription] = useState("");
 
   // Get params from navigation
   const params = useLocalSearchParams<{
@@ -31,7 +31,7 @@ export default function ReportItemScreen() {
 
   // Parse 'from' param
   const fromParam = Array.isArray(params.from) ? params.from[0] : params.from;
-  const backRoute = fromParam === 'list' ? '/list' : '/map';
+  const backRoute = fromParam === "list" ? "/list" : "/map";
 
   // Parse 'photos' param - it comes as a JSON string
   let photosParam: string[] = [];
@@ -39,7 +39,7 @@ export default function ReportItemScreen() {
     const photosValue = Array.isArray(params.photos)
       ? params.photos[0]
       : params.photos;
-    if (typeof photosValue === 'string') {
+    if (typeof photosValue === "string") {
       try {
         photosParam = JSON.parse(photosValue);
       } catch {
@@ -67,7 +67,7 @@ export default function ReportItemScreen() {
       0, // Placeholder latitude
       0, // Placeholder longitude
       localPhotos,
-      user?.uid || 'posterId-placeholder', // Replace with actual poster ID from auth
+      user?.uid || "posterId-placeholder", // Replace with actual poster ID from auth
       description,
       selectedCategory,
     );
@@ -80,25 +80,22 @@ export default function ReportItemScreen() {
 
   return (
     <KeyboardAvoidingView
-      className='flex-1'
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      className="flex-1"
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={{ backgroundColor }}
     >
-      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+      <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
 
       <PageHeader
-        title='Report Item'
+        title="Report Item"
         backTo={backRoute}
-        rightIcon='help-circle'
+        rightIcon="help-circle"
         onRightPress={() =>
-          alert('Need help? Contact support at support@findit.com')
+          alert("Need help? Contact support at support@findit.com")
         }
       />
 
-      <ScrollView
-        className='flex-1'
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         {/* Progress Indicator - Step 1 of 2 */}
         <ProgressIndicator
           currentStep={CURRENT_STEP}
