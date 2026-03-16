@@ -34,7 +34,7 @@ export default function ProfileScreen() {
           <Ionicons name="person" size={48} color="#fff" />
         </View>
         <Text className="text-xl font-bold mb-2" style={{ color: textColor }}>
-          Your Profile
+          {user?.displayName || "User Name"}
         </Text>
         <Text className="text-center" style={{ color: iconColor }}>
           Profile settings and information will appear here

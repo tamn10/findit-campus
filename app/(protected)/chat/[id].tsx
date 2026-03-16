@@ -1,88 +1,217 @@
+import { useAuth } from "@/context/AuthContext";
+import { db } from "@/firebaseConfig";
 import { useThemeColor } from "@/hooks/use-theme-color";
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
+import { useHeaderHeight } from "@react-navigation/elements";
+import { useLocalSearchParams } from "expo-router";
 import {
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-
-const mockMessages = [
-  {
-    id: "1",
-    name: "John Doe",
-    messages: [
-      { id: "1", text: "Hey, is this item still available?", sender: "other" },
-      { id: "2", text: "Yes, it is! Are you interested?", sender: "me" },
-    ],
-  },
-  {
-    id: "2",
-    name: "Jane Smith",
-    messages: [
-      { id: "1", text: "Hi there!", sender: "other" },
-      { id: "2", text: "Hello! How can I help you?", sender: "me" },
-    ],
-  },
-];
+  addDoc,
+  collection,
+  doc,
+  increment,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+  setDoc,
+} from "firebase/firestore";
+import { useCallback, useEffect, useState } from "react";
+import { View } from "react-native";
+import {
+  Bubble,
+  Composer,
+  GiftedChat,
+  IMessage,
+  InputToolbar,
+  Send,
+  useColorScheme,
+} from "react-native-gifted-chat";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function MessagesDetail() {
   const backgroundColor = useThemeColor({}, "background");
-  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState<IMessage[]>([] as IMessage[]);
+  const inset = useSafeAreaInsets();
+  const [text, setText] = useState("");
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const currentUser = useAuth()?.user;
+  const headerHeight = useHeaderHeight();
+  const { posterId } = useLocalSearchParams<{ posterId: string }>();
+
+  useEffect(() => {
+    const q = query(
+      collection(db, "conversations", id, "messages"),
+      orderBy("createdAt", "desc"),
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const msgs = snapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          _id: doc.id,
+          text: data.text,
+          createdAt: data.createdAt?.toDate(),
+          user: {
+            _id: data.senderId,
+          },
+        };
+      });
+
+      setMessages(msgs);
+    });
+
+    return unsubscribe;
+  }, [id]);
+
+  const onSend = useCallback(async (messages: IMessage[] = []) => {
+    const message = messages[0];
+    if (!message || !id || !currentUser) return;
+    try {
+      const messagesRef = collection(db, "conversations", id, "messages");
+      const conversationRef = doc(db, "conversations", id);
+
+      // Write message to subcollection
+      await addDoc(messagesRef, {
+        senderId: currentUser.uid,
+        text: message.text,
+        type: "text",
+        createdAt: serverTimestamp(),
+        isRead: false,
+      });
+
+      // Update parent conversation
+      await setDoc(
+        conversationRef,
+        {
+          participants: [currentUser.uid, posterId],
+          lastMessage: message.text,
+          lastUpdated: serverTimestamp(),
+          lastMessageSenderId: currentUser.uid,
+          unreadCount: increment(1),
+        },
+        { merge: true },
+      );
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  }, []);
+
   return (
-    <SafeAreaView
-      className="flex-1 items-center justify-center"
-      style={{ backgroundColor }}
+    <View
+      style={{
+        flex: 1,
+        marginBottom: inset.bottom,
+        backgroundColor: backgroundColor,
+      }}
     >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={{ flex: 1 }}
-        className="w-full"
-      >
-        <ScrollView style={{ flex: 1 }}>
-          {/* chat messages will go here */}
-          {mockMessages.map((messages) => (
-            <View key={messages.id} className="p-4">
-              <Text className="text-lg font-bold text-white">
-                {messages.name}
-              </Text>
-              {messages.messages.map((message) => (
-                <View
-                  key={message.id}
-                  className={`my-2 p-3 rounded-lg ${message.sender === "me" ? "bg-blue-500 self-end" : "bg-gray-300 self-start"}`}
-                >
-                  <Text
-                    className={`${message.sender === "me" ? "text-white" : "text-black"}`}
-                  >
-                    {message.text}
-                  </Text>
-                </View>
-              ))}
+      <GiftedChat
+        messages={messages}
+        text={text}
+        onSend={(messages: any) => onSend(messages)}
+        user={{
+          _id: currentUser?.uid || "1",
+          name: currentUser?.displayName || "You",
+        }}
+        keyboardAvoidingViewProps={{ keyboardVerticalOffset: headerHeight }}
+        isAlignedTop
+        isSendButtonAlwaysVisible
+        textInputProps={{
+          style: isDark && { backgroundColor: "#2a2a2a", color: "#fff" },
+          onChangeText: setText,
+        }}
+        renderSend={(props) => (
+          <Send {...props}>
+            <View
+              style={{
+                height: 40,
+                width: 40,
+                justifyContent: "center",
+                alignItems: "center",
+                marginRight: 10,
+                marginVertical: 10,
+                backgroundColor: "#2F80ED",
+                borderRadius: 22,
+              }}
+            >
+              <Ionicons
+                name="send"
+                size={22}
+                color={isDark ? "white" : "black"}
+              />
             </View>
-          ))}
-        </ScrollView>
-
-        {/* Input bar */}
-        <View className="flex-row items-center gap-4 p-3">
-          <TextInput
-            placeholder="Type a message..."
-            value={message}
-            onChangeText={setMessage}
-            className="flex-1 bg-neutral-800 text-white rounded-2xl px-4 py-3"
+          </Send>
+        )}
+        renderInputToolbar={(props) => (
+          <InputToolbar
+            {...props}
+            containerStyle={{
+              backgroundColor: backgroundColor,
+              height: 60,
+            }}
+            renderActions={() => (
+              <View
+                style={{
+                  height: 40,
+                  width: 40,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginLeft: 10,
+                  borderRadius: 20,
+                  backgroundColor: isDark ? "#1c1c1e" : "#f2f2f2",
+                  marginVertical: 10,
+                }}
+              >
+                <Ionicons
+                  name="add-outline"
+                  size={24}
+                  color={isDark ? "white" : "black"}
+                />
+              </View>
+            )}
           />
-
-          {message.trim().length > 0 && (
-            <TouchableOpacity>
-              <Ionicons name="send" size={24} color="white" />
-            </TouchableOpacity>
-          )}
-        </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+        )}
+        renderComposer={(props) => (
+          <Composer
+            {...props}
+            textInputProps={{
+              style: {
+                backgroundColor: isDark ? "#1c1c1e" : "#e9edf2",
+                borderRadius: 20,
+                paddingHorizontal: 14,
+                paddingVertical: 8,
+                color: isDark ? "white" : "black",
+                marginHorizontal: 8,
+                minHeight: 38,
+                marginVertical: 10,
+              },
+              onChangeText: setText,
+              placeholder: "Type a message...",
+              placeholderTextColor: "#8e8e93",
+            }}
+          />
+        )}
+        renderBubble={(props) => (
+          <Bubble
+            {...props}
+            wrapperStyle={{
+              right: {
+                borderTopLeftRadius: 16,
+                borderTopRightRadius: 16,
+                borderBottomLeftRadius: 16,
+                borderBottomRightRadius: 0,
+              },
+              left: {
+                borderTopLeftRadius: 16,
+                borderTopRightRadius: 16,
+                borderBottomLeftRadius: 0,
+                borderBottomRightRadius: 16,
+              },
+            }}
+          />
+        )}
+      />
+    </View>
   );
 }

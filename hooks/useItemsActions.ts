@@ -7,6 +7,7 @@ export function useItemsActions() {
     lng: number,
     imgUrl: string[],
     posterId: string,
+    posterName: string,
     description: string,
     category: string,
   ) => {
@@ -24,6 +25,7 @@ export function useItemsActions() {
         location: [lat, lng],
         photos: [downloadURL],
         posterId: posterId,
+        posterName: posterName,
         description: description,
         category: category,
         createdAt: new Date(),
