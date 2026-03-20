@@ -1,5 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
@@ -33,6 +33,7 @@ const activePosts = [
 //const returnedPosts = [];
 
 export default function MyPostsScreen() {
+  const params = useLocalSearchParams<{ returnTo?: string | string[] }>();
   const [selectedTab, setSelectedTab] = useState<"Active" | "Returned">(
     "Active",
   );
@@ -40,6 +41,10 @@ export default function MyPostsScreen() {
   const iconColor = useThemeColor({}, "icon");
   const colorScheme = useColorScheme();
   const tintColor = useThemeColor({}, "tint");
+  const returnToParam = Array.isArray(params.returnTo)
+    ? params.returnTo[0]
+    : params.returnTo;
+  const backRoute = returnToParam || "/map";
 
   // Filter posts based on selected tab
   const filteredPosts = selectedTab === "Active" ? activePosts : []; // returnedPosts will be used once we have data];
@@ -48,7 +53,7 @@ export default function MyPostsScreen() {
     <View className="flex-1" style={{ backgroundColor }}>
       <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
 
-      <PageHeader title="My Posts" backTo="/map" />
+      <PageHeader title="My Posts" showBackButton={false} />
 
       <TabSelector selectedTab={selectedTab} onSelectTab={setSelectedTab} />
 
