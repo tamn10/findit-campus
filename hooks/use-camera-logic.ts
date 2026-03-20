@@ -1,7 +1,7 @@
-import { useState, useRef } from 'react';
+import { useRef, useState } from 'react';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
-import { router, useLocalSearchParams } from 'expo-router';
+import { Href, router, useLocalSearchParams } from 'expo-router';
 
 export function useCameraLogic() {
   // State
@@ -10,8 +10,15 @@ export function useCameraLogic() {
   const cameraRef = useRef<CameraView>(null);
 
   // Parse params
-  const params = useLocalSearchParams<{ from?: string, photos?: string | string[] }>();
-  const fromParam = params.from;
+  const params = useLocalSearchParams<{
+    from?: string | string[];
+    photos?: string | string[];
+    returnTo?: string | string[];
+  }>();
+  const fromParam = Array.isArray(params.from) ? params.from[0] : params.from;
+  const returnToParam = Array.isArray(params.returnTo)
+    ? params.returnTo[0]
+    : params.returnTo;
   
   // Handle photos - can be string (JSON), string array, or undefined
   let existingPhotos: string[] = [];
@@ -95,10 +102,15 @@ export function useCameraLogic() {
 
   // Go back to previous screen (without adding new photos)
   const goBack = () => {
-    router.replace({
-      pathname: '/report-item',
-      params: buildParams(existingPhotos),
-    });
+    if (returnToParam === '/report-item') {
+      router.replace({
+        pathname: '/report-item',
+        params: buildParams(existingPhotos),
+      });
+      return;
+    }
+
+    router.replace((returnToParam || '/map') as Href);
   };
 
   // Computed values

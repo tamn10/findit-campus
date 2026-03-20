@@ -8,6 +8,7 @@ type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
 interface PageHeaderProps {
   title: string;
+  showBackButton?: boolean;
   backTo?: Href;              //e.g. '/map' - if provided, back button will navigate to this route instead of going back in history
   onBackPress?: () => void;
   rightIcon?: IconName;
@@ -16,6 +17,7 @@ interface PageHeaderProps {
 
 export default function PageHeader({ 
   title, 
+  showBackButton = true,
   backTo,
   onBackPress,
   rightIcon,
@@ -32,7 +34,7 @@ export default function PageHeader({
     // Priority 2: Navigate to specific route
     else if (backTo) {
       // Back navigation should not create another stack entry.
-      router.push(backTo);
+      router.replace(backTo);
     } 
     // Priority 3: Default - go back one step
     else {
@@ -46,13 +48,17 @@ export default function PageHeader({
         className="pt-10 pb-4 px-4 mt-2 flex-row items-center justify-between"
         style={{ backgroundColor }}
       >
-        {/* Left: Back Button - ALWAYS SHOWN */}
-        <TouchableOpacity 
-          className="w-10 h-10 items-center justify-center"
-          onPress={handleBackPress}
-        >
-          <Ionicons name="chevron-back" size={28} color={textColor} />
-        </TouchableOpacity>
+        {/* Left: Optional Back Button */}
+        {showBackButton ? (
+          <TouchableOpacity
+            className="w-10 h-10 items-center justify-center"
+            onPress={handleBackPress}
+          >
+            <Ionicons name="chevron-back" size={28} color={textColor} />
+          </TouchableOpacity>
+        ) : (
+          <View className="w-10 h-10" />
+        )}
         
         {/* Middle: Page Title - ALWAYS SHOWN */}
         <Text 

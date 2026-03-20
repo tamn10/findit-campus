@@ -50,9 +50,16 @@ export default function PhotoUpload({ photos = [], from, onRemovePhoto }: PhotoU
   const handleAddPhoto = () => {
     router.push({ 
       pathname: '/camera', 
-      params: from 
-        ? { from, photos: JSON.stringify(photos) } 
-        : { photos: JSON.stringify(photos) } 
+      params: from
+        ? {
+            from,
+            photos: JSON.stringify(photos),
+            returnTo: '/report-item',
+          }
+        : {
+            photos: JSON.stringify(photos),
+            returnTo: '/report-item',
+          }
     });
   };
 

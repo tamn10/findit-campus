@@ -1,9 +1,18 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Tabs } from "expo-router";
+import { router, Tabs, useSegments } from "expo-router";
 import React from "react";
-import { View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 
 export default function TabsLayout() {
+  const segments = useSegments();
+  const currentTab = segments[segments.length - 1];
+  const returnTo =
+    typeof currentTab === "string" && currentTab !== "camera"
+      ? `/${currentTab}`
+      : "/map";
+  const reportFrom =
+    currentTab === "list" || currentTab === "map" ? currentTab : undefined;
+
   return (
     <Tabs
       screenOptions={{
@@ -35,10 +44,23 @@ export default function TabsLayout() {
         options={{
           title: "",
           tabBarShowLabel: false,
-          tabBarIcon: ({ color, size }) => (
-            <View className="h-16 w-16 rounded-full bg-blue-500 items-center justify-center -mt-8">
-              <Ionicons name="camera" size={28} color="white" />
-            </View>
+          tabBarButton: () => (
+            <TouchableOpacity
+              activeOpacity={0.9}
+              className="items-center justify-center -mt-8"
+              onPress={() =>
+                router.push({
+                  pathname: "/camera",
+                  params: reportFrom
+                    ? { from: reportFrom, returnTo }
+                    : { returnTo },
+                })
+              }
+            >
+              <View className="h-16 w-16 rounded-full bg-blue-500 items-center justify-center">
+                <Ionicons name="camera" size={28} color="white" />
+              </View>
+            </TouchableOpacity>
           ),
         }}
       />
