@@ -1,65 +1,69 @@
 import Header from "@/components/map/Header";
+import ItemBottomSheet from "@/components/map/ItemBottomSheet";
+import MapControls from "@/components/map/MapControl";
 import RecentlyFoundItems from "@/components/map/RecentlyFoundItems";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useAuth } from "@/context/AuthContext";
 import { useThemeColor } from "@/hooks/use-theme-color";
-import Ionicons from "@expo/vector-icons/Ionicons";
+import { useItemsActions } from "@/hooks/useItemsActions";
+import { useMapLocation } from "@/hooks/useMapLocations";
+import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import * as Location from "expo-location";
-import React, { useEffect, useRef, useState } from "react";
-import { TouchableOpacity, View } from "react-native";
-import MapView from "react-native-maps";
+import { useRouter } from "expo-router";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { View } from "react-native";
+import MapView, { Marker } from "react-native-maps";
 
-const recentlyFoundItems = [
-  {
-    id: "1",
-    name: "AirPods Pro",
-    location: "Science Lab",
-    status: "New",
-  },
-  {
-    id: "2",
-    name: "Denim Jacket",
-    location: "Library",
-    status: "Found",
-  },
-  {
-    id: "3",
-    name: "Water Bottle",
-    location: "Gym",
-    status: "New",
-  },
-  {
-    id: "4",
-    name: "Textbook",
-    location: "Library",
-    status: "Found",
-  },
-  {
-    id: "5",
-    name: "Backpack",
-    location: "Student Union",
-    status: "Found",
-  },
-];
+type LostItem = {
+  id: string;
+  name: string;
+  description: string;
+  posterId: string;
+  posterName: string;
+  latitude: number;
+  longitude: number;
+  createdAt: Date;
+};
 
 export default function CampusMapScreen() {
-  const mapRef = useRef<MapView>(null);
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const { mapRef, handleUserLocation, handleInitialLocation } =
+    useMapLocation();
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState("Electronics");
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const backgroundColor = useThemeColor({}, "background");
-  const colorScheme = useColorScheme();
+  const [selectedItem, setSelectedItem] = useState<LostItem | null>(null);
   const [location, setLocation] = useState<Location.LocationObject | null>(
     null,
   );
+  const [lostItems, setLostItems] = useState<LostItem[]>([]);
   const [initialPosition, setInitialPosition] = useState({
     latitude: 33.8808,
     longitude: -117.885,
     latitudeDelta: 0.005,
     longitudeDelta: 0.005,
   });
+  const { user } = useAuth();
+
+  const { fetchItems, getPosterName } = useItemsActions();
 
   useEffect(() => {
     Location.requestForegroundPermissionsAsync();
+    fetchItems().then((items) => {
+      const formattedItems = items.map((item: any) => ({
+        id: item.id,
+        name: item.description,
+        description: item.description,
+        posterId: item.posterId,
+        posterName: item.posterName,
+        latitude: item.location[0],
+        longitude: item.location[1],
+        createdAt: item.createdAt,
+      }));
+
+      setLostItems(formattedItems);
+    });
   }, []);
 
   let text = "Waiting...";
@@ -69,40 +73,16 @@ export default function CampusMapScreen() {
     text = JSON.stringify(location);
   }
 
-  const handleUserLocation = async () => {
-    try {
-      // Request location permissions
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setErrorMsg("Permission to access location was denied");
-        return;
-      }
-
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
-
-      // move map to user location
-      if (mapRef.current && location) {
-        mapRef.current.animateToRegion(
-          {
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-          },
-          1000,
-        );
-      }
-    } catch (error) {
-      setErrorMsg("Error fetching location");
-    }
-  };
-
-  const handleInitialLocation = () => {
-    if (mapRef.current) {
-      mapRef.current.animateToRegion(initialPosition, 1000);
-    }
-  };
+  const renderBackdrop = useCallback(
+    (props: any) => (
+      <BottomSheetBackdrop
+        {...props}
+        disappearsOnIndex={0}
+        appearsOnIndex={1}
+      />
+    ),
+    [],
+  );
 
   return (
     <View className="flex-1" style={{ backgroundColor }}>
@@ -117,29 +97,37 @@ export default function CampusMapScreen() {
           showsUserLocation={true}
           showsCompass={false}
           provider={undefined}
-        />
-
-        {/* User Location & Initial Location Buttons */}
-
-        <View className="absolute top-5 right-3 gap-2">
-          <TouchableOpacity
-            activeOpacity={0.8}
-            className="bg-white p-3 shadow-lg rounded-lg"
-            onPress={handleInitialLocation}
-          >
-            <Ionicons name="home" size={24} color="black" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            activeOpacity={0.8}
-            className="bg-white p-3 shadow-lg rounded-lg"
-            onPress={handleUserLocation}
-          >
-            <Ionicons name="navigate" size={24} color="black" />
-          </TouchableOpacity>
-        </View>
-
+        >
+          {lostItems.map((item) => (
+            <Marker
+              key={item.id}
+              coordinate={{
+                latitude: item.latitude,
+                longitude: item.longitude,
+              }}
+              onPress={async () => {
+                setSelectedItem(item);
+                bottomSheetRef.current?.expand();
+              }}
+            />
+          ))}
+        </MapView>
         {/* Placeholder for recently found items*/}
         <RecentlyFoundItems />
+        {/* User Location & Initial Location Buttons */}
+        <MapControls
+          onUserLocation={handleUserLocation}
+          onInititalLocation={handleInitialLocation}
+        />
+        {selectedItem && (
+          <ItemBottomSheet
+            bottomSheetRef={bottomSheetRef}
+            renderBackdrop={renderBackdrop}
+            selectedItem={selectedItem}
+            currentUser={user}
+            router={router}
+          />
+        )}
       </View>
     </View>
   );

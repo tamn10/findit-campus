@@ -22,7 +22,8 @@ export default function WelcomeScreen() {
         <Text className="text-center text-sm text-gray-400 mb-10">
           Lost something on campus? We can help you find it!
         </Text>
-        <Link href="/register" asChild>
+        {/* <Link href="/register" asChild> */}
+        <Link href="/introduction" asChild>
           <Pressable className="w-full bg-blue-600 py-4 rounded-2xl mb-4">
             <Text className="text-center text-white text-lg font-semibold">
               Get Started

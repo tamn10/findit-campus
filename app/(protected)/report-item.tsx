@@ -9,12 +9,19 @@ import PhotoUpload from "@/components/report-items/PhotoUpload";
 import SubmitButton from "@/components/report-items/SubmitButton";
 import PageHeader from "@/components/shared/PageHeader";
 import ProgressIndicator from "@/components/ui/progress-indicator";
+import { useAuth } from "@/context/AuthContext";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeColor } from "@/hooks/use-theme-color";
+import { useItemsActions } from "@/hooks/useItemsActions";
 
 export default function ReportItemScreen() {
   const backgroundColor = useThemeColor({}, "background");
   const colorScheme = useColorScheme();
+  const { submitItem } = useItemsActions();
+  const { user } = useAuth();
+
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [description, setDescription] = useState("");
 
   // Get params from navigation
   const params = useLocalSearchParams<{
@@ -55,6 +62,19 @@ export default function ReportItemScreen() {
     setLocalPhotos((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const handleSubmit = () => {
+    submitItem(
+      0, // Placeholder latitude
+      0, // Placeholder longitude
+      localPhotos,
+      user?.uid || "posterId-placeholder", // Replace with actual poster ID from auth
+      user?.displayName || "posterName-placeholder", // Replace with actual poster name from auth
+      description,
+      selectedCategory,
+    );
+    // After submission, navigate to a confirmation screen or back to list/map
+  };
+
   // MODIFY THESE VALUES to change step progression
   const CURRENT_STEP = 1;
   const TOTAL_STEPS = 2;
@@ -87,7 +107,12 @@ export default function ReportItemScreen() {
         <LocationSection />
 
         {/* Item Details (Category + Description) */}
-        <ItemDetailsForm />
+        <ItemDetailsForm
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+          description={description}
+          setDescription={setDescription}
+        />
 
         {/* Photo Upload - Pass photos array and removal handler */}
         <PhotoUpload
@@ -97,7 +122,7 @@ export default function ReportItemScreen() {
         />
 
         {/* Submit Button */}
-        <SubmitButton />
+        <SubmitButton onPress={handleSubmit} />
       </ScrollView>
     </KeyboardAvoidingView>
   );

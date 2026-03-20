@@ -8,14 +8,16 @@ import {
 import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
-import "react-native-reanimated";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "../global.css";
 
 export default function RootLayout() {
   return (
-    <AuthProvider>
-      <RootNavigator />
-    </AuthProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <AuthProvider>
+        <RootNavigator />
+      </AuthProvider>
+    </GestureHandlerRootView>
   );
 }
 
@@ -32,16 +34,22 @@ function RootNavigator() {
     const inAuthGroup = segments[0] === "(auth)";
     const inProtectedGroup = segments[0] === "(protected)";
 
-    if (user && !user.emailVerified) {
-      // Route user to email verification screen if not verified
-      if (segments[1] !== "verify-email") {
-        router.replace("/(auth)/verify-email");
-      }
-    } else if (user && user.emailVerified && !inProtectedGroup) {
-      // If logged in and email verified but not in protected route, send to home
+    // if (user && !user.emailVerified) {
+    //   // Route user to email verification screen if not verified
+    //   if (segments[1] !== "verify-email") {
+    //     router.replace("/(auth)/verify-email");
+    //   }
+    // } else if (user && user.emailVerified && !inProtectedGroup) {
+    //   // If logged in and email verified but not in protected route, send to home
+    //   router.replace("/(protected)/(tabs)/map");
+    // } else if (!user && inProtectedGroup) {
+    //   router.replace("/");
+    // }
+
+    if (user && !inProtectedGroup) {
       router.replace("/(protected)/(tabs)/map");
-    } else if (!user && inProtectedGroup) {
-      router.replace("/");
+    } else if (!user && !inAuthGroup) {
+      router.replace("/(auth)/login");
     }
   }, [user, loading, segments]);
 
@@ -51,6 +59,7 @@ function RootNavigator() {
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" />
+        <Stack.Screen name="introduction" />
         <Stack.Screen name="(auth)" />
         <Stack.Screen name="(protected)" />
       </Stack>
